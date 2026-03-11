@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 40px;
+      margin: 0;
+      background: #fff5f8;
+      /* Soft blush body background */
+    }
+  </style>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <h1 style="color: #83394a;">Welcome to Fradels Bakers</h1>
+  <p style="color: #8d6e63;">The authentic taste of India.</p>
+
+  <section class="reviews-section">
+    <h2 style="color:#a55166;">What Our Customers Say</h2>
+
+    <div class="reviews-container">
+      <div class="review-card">
+        <p>
+          The cakes are absolutely delicious and beautifully packed.
+          Perfect for birthdays and family celebrations!
+        </p>
+        <div class="review-footer">
+          <span class="name">— Ananya</span>
+          <span class="stars">★★★★★</span>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <p>
+          Bakers products never disappoint. Fresh ingredients and amazing taste.
+          Highly recommended!
+        </p>
+        <div class="review-footer">
+          <span class="name">— Rahul</span>
+          <span class="stars">★★★★☆</span>
+        </div>
+      </div>
+
+      <div class="review-card">
+        <p>
+          Loved the dessert range! The chocolate cake was a hit at our party.
+        </p>
+        <div class="review-footer">
+          <span class="name">— Meera</span>
+          <span class="stars">★★★★★</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <h1 style="color: #f48fb1; text-align: center;"> CELEBRATE WITH YOUR LOVED ONES </h1>
+  <section class="event-banner">
+    <div class="event-slide active">
+      <div class="event-content">
+        <h1>Celebrate Birthdays</h1>
+        <p>Make birthdays sweeter with our special cakes</p>
+        <button onclick="window.location.href='items.html'">Order Now</button>
+      </div>
+    </div>
+
+    <div class="event-slide">
+      <div class="event-content">
+        <h1>Chocolate Desserts</h1>
+        <p>Indulge in rich chocolate cakes & desserts</p>
+        <button onclick="window.location.href='items.html'">Explore Desserts</button>
+      </div>
+    </div>
+
+    <div class="event-slide">
+      <div class="event-content">
+        <h1>Festive Celebrations</h1>
+        <p>Perfect treats for every special occasion</p>
+        <button onclick="window.location.href='items.html'">Shop Now</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    let slides = document.querySelectorAll(".event-slide");
+    let index = 0;
+
+    setInterval(() => {
+      slides[index].classList.remove("active");
+      index = (index + 1) % slides.length;
+      slides[index].classList.add("active");
+    }, 4000);
+  </script>
+
+</body>
+
+</html>

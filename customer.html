@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer Page</title>
+<style>
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #faebf4;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+}
+
+.center-box {
+  background: #fffaf0;
+  padding: 40px 60px;
+  border-radius: 16px;
+  width: 420px;
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.center-box h1,
+.center-box p {
+  margin-bottom: 20px;
+}
+
+.center-box label {
+  display: block;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.option-group {
+  text-align: left;
+  margin: 20px 0;
+}
+
+.option-group label {
+  display: block;
+  margin: 12px 0;
+  font-size: 16px;
+}
+
+.center-box input[type="text"],
+.center-box input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 6px;
+}
+
+.center-box button {
+  margin-top: 15px;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  background: #e97aa9;
+  color: white;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.center-box button:hover {
+  background: #d86494;
+}
+
+.back-link {
+  display: block;
+  margin-bottom: 15px;
+  text-align: left;
+}
+</style>
+</head>
+
+<body>
+<div class="center-box">
+
+ <button onclick="redirectToPage('main.html')">Back</button>
+
+  <h1>Customer Page</h1>
+
+  <div class="option-group">
+    <label>
+      <input type="radio" name="authChoice" value="signup"> Sign up
+    </label>
+
+    <label>
+      <input type="radio" name="authChoice" value="login"> Log in
+    </label>
+  </div>
+
+  <button onclick="calcc()">Continue</button>
+
+  <p id="og"></p>
+
+  <div id="formArea" style="display:none;">
+    <label>Username</label>
+    <input type="text" id="user">
+
+    <label>Password</label>
+    <input type="password" id="pwd" minlength="8">
+
+    <button id="formActionBtn">Continue</button>
+  </div>
+</div>
+
+<script>
+  function redirectToPage(url) {
+    window.location.href = url;
+  }
+
+  function getCustomers() {
+    const data = localStorage.getItem("customers");
+    return data ? JSON.parse(data) : [];
+  }
+
+  function saveCustomers(customers) {
+    localStorage.setItem("customers", JSON.stringify(customers));
+  }
+
+  (function seedDemoUsers() {
+    const existing = getCustomers();
+    if (existing.length === 0) {
+      saveCustomers([
+        { username: "Shreya", password: "Shreya123" },
+        { username: "User1",  password: "User1234" },
+        { username: "Test",   password: "Test1234" }
+      ]);
+    }
+  })();
+
+  function calcc() {
+    const selected = document.querySelector('input[name="authChoice"]:checked');
+    const output = document.getElementById("og");
+    const form = document.getElementById("formArea");
+    const actionBtn = document.getElementById("formActionBtn");
+
+    if (!selected) {
+      output.innerText = "Please select Sign up or Log in.";
+      form.style.display = "none";
+      return;
+    }
+
+    if (selected.value === "signup") {
+      output.innerText = "Signup selected";
+      form.style.display = "block";
+      actionBtn.innerText = "Sign up";
+      actionBtn.onclick = handleSignup;
+    } else if (selected.value === "login") {
+      output.innerText = "Login selected";
+      form.style.display = "block";
+      actionBtn.innerText = "Log in";
+      actionBtn.onclick = handleLogin;
+    }
+  }
+
+  function handleSignup() {
+    const u = document.getElementById("user").value.trim();
+    const p = document.getElementById("pwd").value.trim();
+    const output = document.getElementById("og");
+
+    if (!u || !p) {
+      output.innerText = "Please enter both username and password.";
+      return;
+    }
+
+    let customers = getCustomers();
+
+    const exists = customers.some(c => c.username === u);
+    if (exists) {
+      output.innerText = "Username already exists. Please choose another.";
+      return;
+    }
+
+    customers.push({ username: u, password: p });
+    saveCustomers(customers);
+
+    output.innerText = "Signup successful! You can now log in.";
+    window.location.href = "products.html";
+  }
+
+  function handleLogin() {
+    const u = document.getElementById("user").value.trim();
+    const p = document.getElementById("pwd").value.trim();
+    const output = document.getElementById("og");
+
+    const customers = getCustomers();
+    const match = customers.find(c => c.username === u && c.password === p);
+
+    if (match) {
+      output.innerText = "Login successful!";
+      localStorage.setItem("currentUser", JSON.stringify(match));
+      window.location.href = "home.html";
+    } else {
+      output.innerText = "Incorrect username or password.";
+    }
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #faebf4;
+  font-family: Arial, sans-serif;
+}
+
+.center-box {
+  background: #fffaf0;
+  padding: 40px 60px;
+  border-radius: 16px;
+  width: 420px;
+  text-align: center;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+
+.center-box h1,
+.center-box p {
+  margin-bottom: 20px;
+}
+
+.center-box label {
+  display: block;
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.center-box input[type="text"],
+.center-box input[type="password"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 6px;
+}
+
+.center-box button {
+  margin-top: 15px;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  background: #e97aa9;
+  color: white;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.center-box button:hover {
+  background: #d86494;
+}
+
+.back-link {
+  display: block;
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+</style>
+</head>
+
+<body>
+<div class="center-box">
+  <p><strong>SIGN IN AS</strong></p>
+
+  <label>
+    <input type="radio" name="destination" onchange="redirectToPage('admin.html')">
+    Administrator
+  </label>
+
+  <label>
+    <input type="radio" name="destination" onchange="redirectToPage('customer.html')">
+    Customer
+  </label>
+</div>
+
+<script>
+function redirectToPage(url) {
+  window.location.href = url;
+}
+</script>
+</body>
+</html>

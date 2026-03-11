@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .buy-row {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .price {
+      font-weight: 800;
+      color: #5d4037;
+      /* Mocha text */
+      font-size: 1.1rem;
+    }
+
+    .add-btn {
+      padding: 8px 14px;
+      border: none;
+      background: #f48fb1;
+      /* Cute soft pink */
+      color: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: 0 4px 8px rgba(244, 143, 177, 0.4);
+      transition: background 0.2s;
+    }
+
+    .add-btn:hover {
+      background: #f06292;
+    }
+
+    .qty-stepper {
+      display: none;
+      /* hidden until item added */
+      align-items: center;
+      border: 2px solid #f8bbd0;
+      /* Soft pink border */
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .qty-stepper button {
+      background: transparent;
+      border: none;
+      color: #d81b60;
+      /* Cute deep pink */
+      font-size: 16px;
+      font-weight: bold;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      flex-shrink: 0;
+    }
+
+    .qty-stepper button:hover {
+      background: rgba(248, 187, 208, 0.2);
+    }
+
+    .qty-stepper .qty-num {
+      min-width: 28px;
+      text-align: center;
+      font-weight: 700;
+      color: #5d4037;
+      /* Mocha brown */
+      font-size: 15px;
+      user-select: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="image-grid" id="productGrid">
+    <!-- Products will be loaded dynamically via JS -->
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, setDoc, doc, updateDoc, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2NeomlNHM7jTFQXoCIt3xR3L1rKGWjoc",
+      authDomain: "bakery-site-3b5a3.firebaseapp.com",
+      projectId: "bakery-site-3b5a3",
+      storageBucket: "bakery-site-3b5a3.firebasestorage.app",
+      messagingSenderId: "35232571735",
+      appId: "1:35232571735:web:8a9c607dc990802d135e12"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const defaultProducts = [
+      { id: 'brownie', name: 'Assorted Brownies 1/2kg', desc: 'Filled with gooey choco-chips', price: 400, image: 'brownie.jpg' },
+      { id: 'cookie', name: 'Choco-chip cookies 1/2kg', desc: 'Filled with gooey center, hard on the outside', price: 350, image: 'cookie.jpg' },
+      { id: 'biscoff', name: 'Biscoff Cheesecake 1/2kg', desc: 'A layer of biscoff base, a thick creamy cheese layer, a layer of biscoff spread ganache', price: 650, image: 'biscoffcheesecake.jpg' },
+      { id: 'oatmeal', name: 'Oatmeal Raisin Cookies 1/2kg', desc: 'Chewy cookies, chewy raisins, chewy oatmeal!!', price: 320, image: 'oatmealcookies.jpg' },
+      { id: 'tiramisu', name: 'Tiramisu 1/2kg', desc: 'Fine balance of bitter and sweet~', price: 550, image: 'tiramisu.jpg' },
+      { id: 'mango_donuts', name: 'Mango Donuts 6pcs', desc: 'Soft and chewy donuts, with a delicious mango puree!', price: 280, image: 'md.jpg' },
+      { id: 'mini_pie', name: 'Assorted Mini Pie 1/2kg', desc: 'Filled with creamy center, topped with fresh fruits :)', price: 500, image: 'spie.jpg' },
+      { id: 'red_velvet', name: 'Red Velvet Cake 1/2kg', desc: 'Lush red color on the outside, rich chocolate flavor inside!', price: 600, image: 'redvelc.jpg' }
+    ];
+
+    async function getProducts() {
+      const productsData = [];
+      try {
+        const querySnapshot = await getDocs(collection(db, "products"));
+        if (querySnapshot.empty) {
+          // If empty in DB, render defaults to DOM visually
+          return defaultProducts;
+        } else {
+          querySnapshot.forEach((doc) => {
+            productsData.push({ id: doc.id, ...doc.data() });
+          });
+        }
+      } catch (e) {
+        console.error("Error fetching products:", e);
+      }
+      return productsData;
+    }
+
+    async function renderProducts() {
+      const products = await getProducts();
+      const grid = document.getElementById("productGrid");
+      let html = "";
+      products.forEach(p => {
+        const safeId = p.id.replace(/'/g, "\\'");
+        const safeName = p.name.replace(/'/g, "\\'");
+        html += `
+          <div class="image-card">
+            <img src="${p.image}" alt="${p.name}">
+            <div class="image-info">
+              <h3>${p.name}</h3>
+              <p>${p.desc}</p>
+              <div class="buy-row">
+                <span class="price">₹${p.price}</span>
+                <button class="add-btn" id="btn-${p.id}" onclick="window.addToCart('${safeId}','${safeName}',${p.price})">Add to Cart</button>
+                <div class="qty-stepper" id="stepper-${p.id}">
+                  <button id="left-${p.id}" onclick="window.decrease('${safeId}','${safeName}',${p.price})">🗑</button>
+                  <span class="qty-num" id="qty-${p.id}">1</span>
+                  <button onclick="window.increase('${safeId}','${safeName}',${p.price})">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      grid.innerHTML = html;
+
+      // Now that the UI is rendered, restore the cart UI state
+      const cart = getCart();
+      cart.forEach(item => updateUI(item.id));
+    }
+
+    // --- CARTS LOGIC ---
+    function getCart() {
+      var data = localStorage.getItem("cart");
+      return data ? JSON.parse(data) : [];
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+      try {
+        if (window.parent && typeof window.parent.updateCartBadge === "function") {
+          window.parent.updateCartBadge();
+        }
+      } catch (e) {
+        console.log("Could not update parent badge: ", e);
+      }
+    }
+
+    function updateUI(id) {
+      var cart = getCart();
+      var item = null;
+      for (var i = 0; i < cart.length; i++) {
+        if (cart[i].id === id) { item = cart[i]; break; }
+      }
+
+      var btn = document.getElementById("btn-" + id);
+      var stepper = document.getElementById("stepper-" + id);
+      var qtySpan = document.getElementById("qty-" + id);
+      var leftBtn = document.getElementById("left-" + id);
+
+      if (!btn || !stepper) return;
+
+      if (!item || item.qty <= 0) {
+        btn.style.display = "";
+        stepper.style.display = "none";
+      } else {
+        btn.style.display = "none";
+        stepper.style.display = "inline-flex";
+        qtySpan.textContent = item.qty;
+        leftBtn.textContent = item.qty === 1 ? "🗑" : "−";
+      }
+    }
+
+    window.addToCart = function (id, name, price) {
+      var cart = getCart();
+      var idx = -1;
+      for (var i = 0; i < cart.length; i++) {
+        if (cart[i].id === id) { idx = i; break; }
+      }
+      if (idx >= 0) {
+        cart[idx].qty += 1;
+      } else {
+        cart.push({ id: id, name: name, price: price, qty: 1 });
+      }
+      saveCart(cart);
+      updateUI(id);
+    }
+
+    window.increase = function (id, name, price) {
+      var cart = getCart();
+      for (var i = 0; i < cart.length; i++) {
+        if (cart[i].id === id) { cart[i].qty += 1; break; }
+      }
+      saveCart(cart);
+      updateUI(id);
+    }
+
+    window.decrease = function (id, name, price) {
+      var cart = getCart();
+      for (var i = 0; i < cart.length; i++) {
+        if (cart[i].id === id) {
+          cart[i].qty -= 1;
+          if (cart[i].qty <= 0) cart.splice(i, 1);
+          break;
+        }
+      }
+      saveCart(cart);
+      updateUI(id);
+    }
+
+    // Initialize items display
+    renderProducts();
+  </script>
+</body>
+
+</html>

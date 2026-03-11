@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Admin – All Orders</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #faebf4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #fffaf0;
+      padding: 20px 30px;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .no-orders {
+      text-align: center;
+      margin-top: 20px;
+      font-style: italic;
+    }
+
+    .back-link {
+      margin-bottom: 10px;
+      display: inline-block;
+      text-decoration: none;
+      color: #e97aa9;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <a href="Admin_home.html" class="back-link">← Back to Admin Home</a>
+    <h2>All Orders</h2>
+
+    <div id="ordersArea"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, setDoc, doc, updateDoc, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2NeomlNHM7jTFQXoCIt3xR3L1rKGWjoc",
+      authDomain: "bakery-site-3b5a3.firebaseapp.com",
+      projectId: "bakery-site-3b5a3",
+      storageBucket: "bakery-site-3b5a3.firebasestorage.app",
+      messagingSenderId: "35232571735",
+      appId: "1:35232571735:web:8a9c607dc990802d135e12"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadOrders() {
+      const area = document.getElementById("ordersArea");
+      const orders = [];
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "orders"));
+        querySnapshot.forEach((doc) => {
+          orders.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Sort by timestamp descending so newest orders are at the top
+        orders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      } catch (e) {
+        console.error("Error getting documents: ", e);
+        area.innerHTML = '<p class="no-orders" style="color: #d81b60;">Error loading orders from database.</p>';
+        return;
+      }
+
+      if (orders.length === 0) {
+        area.innerHTML = '<p class="no-orders">No orders have been placed yet.</p>';
+        return;
+      }
+
+      let html = `
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Date & Time</th>
+            <th>Items</th>
+            <th>Total (₹)</th>
+            <th>Address</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+
+      orders.forEach(order => {
+        const itemsList = order.items
+          .map(item => `${item.name} (x${item.qty}) – ₹${item.price * item.qty}`)
+          .join("<br>");
+
+        // Format date if it exists
+        const dateStr = order.timestamp ? new Date(order.timestamp).toLocaleString() : 'N/A';
+
+        html += `
+        <tr>
+          <td><small>${order.id}</small></td>
+          <td><small>${dateStr}</small></td>
+          <td>${itemsList}</td>
+          <td>₹${order.total}</td>
+          <td>${order.address}</td>
+        </tr>
+      `;
+      });
+
+      html += `
+        </tbody>
+      </table>
+    `;
+
+      area.innerHTML = html;
+    }
+
+    // Load when page opens
+    loadOrders();
+  </script>
+</body>
+
+</html>

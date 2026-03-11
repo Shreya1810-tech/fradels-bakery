@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Login</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #faebf4;
+      font-family: Arial, sans-serif;
+    }
+    .center-box {
+      background: #fffaf0;
+      padding: 40px 60px;
+      border-radius: 16px;
+      width: 420px;
+      text-align: center;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+    .center-box label {
+      display: block;
+      margin: 10px 0;
+      cursor: pointer;
+    }
+    .center-box input[type="text"],
+    .center-box input[type="password"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 6px;
+    }
+    .center-box button {
+      margin-top: 15px;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      background: #e97aa9;
+      color: white;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .center-box button:hover {
+      background: #d86494;
+    }
+    .back-link {
+      display: block;
+      margin-bottom: 15px;
+      text-align: left;
+    }
+  </style>
+</head>
+
+<body>
+<div class="center-box">
+  <label class="back-link">
+    <input type="radio" onchange="redirectToPage('main.html')"> BACK
+  </label>
+
+  <h1>Admin Login</h1>
+
+  <label>Username</label>
+  <input type="text" id="user">
+
+  <label>Password</label>
+  <input type="password" id="pwd" minlength="8">
+
+  <button onclick="adminLogin()">
+    Submit
+  </button>
+  <p id="print"></p>
+</div>
+
+<script>
+  // Admin credentials stored in an object
+  const adminCred = {
+    username: "Shreya",
+    password: "Shreya123"
+  };
+
+  function adminLogin() {
+    const u = document.getElementById("user").value;
+    const p = document.getElementById("pwd").value;
+
+    if (u === adminCred.username && p === adminCred.password) {
+      document.getElementById("print").innerText = "Correct, you may proceed!";
+      window.location.href = "Admin_home.html";
+    } else {
+      document.getElementById("print").innerText = "Username/password entered is incorrect. Please try again.";
+    }
+  }
+
+  function redirectToPage(url) {
+    window.location.href = url;
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.image-card {
+  border: 2px solid #f8bbd0; /* Soft pastel pink border */
+  border-radius: 12px;
+  overflow: hidden;        
+  background: #fffdfc; /* Clean creamy white */
+  box-shadow: 0 4px 10px rgba(248, 187, 208, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.image-card:hover {
+  box-shadow: 0 8px 18px rgba(248, 187, 208, 0.4);
+}
+
+.image-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.image-card:hover img {
+  transform: scale(1.08);
+}
+
+.image-card img{
+width:100%;
+height:180px;
+object-fit:cover;
+display:block;
+}
+
+.image-info{
+padding:1rem;
+}
+
+.image-info h3{
+  margin: 0 0 0.5rem;
+  font-size:1.15rem;
+  color: #5d4037; /* Mocha brown */
+  font-family: Arial, sans-serif;
+}
+
+.image-info p{
+  margin:0;
+  font-size:0.95rem;
+  color:#8d6e63; /* Lighter warm brown */
+}
+
+footer {
+    background: #fce4ec; /* Light blush pink footer */
+    padding: 30px 0;
+    font-size: 14px;
+    color: #8d6e63;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-top: 2px dashed #f8bbd0;
+}
+
+.footer-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: #d81b60; /* Deep cute pink */
+    font-weight: 600;
+}
+
+.footer-links a:hover {
+    color: #e91e63;
+}
+
+.footer-copy {
+    text-align: center;
+}
+
+.about-gallery {
+  flex:1;
+  padding: 40px;
+  text-align: center;
+  background-color: #fffaf0; /* Creme */
+}
+
+.about-gallery h2 {
+  color: #f48fb1; /* Soft pink */
+  margin-bottom: 30px;
+  font-size: 34px;
+}
+.about-content {
+  margin-top: 60px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.8;
+}
+
+.gallery {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;   
+  padding-bottom: 10px;
+}
+
+.gallery img {
+  width: 280px;
+  height: 220px;
+  flex-shrink: 0;     
+  object-fit: cover;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.gallery img:hover {
+  transform: scale(1.05);
+}
+
+.reviews-section {
+  padding: 60px 80px;
+  background: #fff5f8; /* Very soft blush body background */
+  text-align: center;
+}
+
+.reviews-section h2 {
+  font-size: 34px;
+  color: #f48fb1; /* Cute soft pink */
+  margin-bottom: 40px;
+}
+
+.reviews-container {
+  display: flex;
+  gap: 25px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.review-card {
+  background: #fffdfc;
+  width: 300px;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(248, 187, 208, 0.25);
+  text-align: left;
+  border: 2px solid #fce4ec;
+}
+
+.review-card p {
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  color: #8d6e63;
+}
+
+.review-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.review-footer .name {
+  font-weight: bold;
+  color: #5d4037;
+}
+
+.review-footer .stars {
+  color: #f48fb1; /* Pink stars instead of yellow for super cute theme */
+  font-size: 16px;
+}
+.event-banner {
+  position: relative;
+  height: 420px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.event-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  display: none;
+  align-items: center;
+  padding-left: 80px;
+}
+
+.event-slide.active {
+  display: flex;
+}
+
+.event-slide:nth-child(1) {
+  background-image: url("birthday.png");
+}
+
+.event-slide:nth-child(2) {
+  background-image: url("chocolates.jpg");
+}
+
+.event-slide:nth-child(3) {
+  background-image: url("celebration.jpg");
+}
+
+.event-content {
+  background: rgba(255, 253, 252, 0.95); /* Creamy overlay */
+  padding: 40px;
+  border-radius: 15px;
+  max-width: 420px;
+  border: 2px dashed #f8bbd0;
+}
+
+.event-content h1 {
+  font-size: 36px;
+  color: #f48fb1;
+  margin-bottom: 15px;
+}
+
+.event-content p {
+  font-size: 16px;
+  margin-bottom: 25px;
+  color: #5d4037;
+}
+
+.event-content button {
+  padding: 12px 30px;
+  border: none;
+  background: #f48fb1;
+  color: #fff;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 25px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(244, 143, 177, 0.4);
+  transition: background 0.2s;
+}
+.event-content button:hover {
+  background: #f06292;
+}
+
+
+
+
+
+

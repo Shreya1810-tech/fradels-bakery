@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Your Cart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff5f8;
+      /* Soft blush body background */
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fffdfc;
+      /* Creme container */
+      padding: 20px 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(248, 187, 208, 0.3);
+      border: 2px solid #fce4ec;
+      /* Light pink border */
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #f8bbd0;
+      /* Sweet pink border */
+      padding: 10px 8px;
+      text-align: left;
+      color: #5d4037;
+      /* Mocha text */
+    }
+
+    .total-row {
+      font-weight: bold;
+    }
+
+    .qty-input {
+      width: 50px;
+    }
+
+    .btn {
+      margin-top: 10px;
+      padding: 10px 16px;
+      border: none;
+      background: #f48fb1;
+      /* Soft pink */
+      color: white;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(244, 143, 177, 0.3);
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #f06292;
+      /* Slightly darker hover */
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 70px;
+      margin-top: 5px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 2px solid #f8bbd0;
+      color: #5d4037;
+    }
+
+    iframe {
+      width: 100%;
+      height: 250px;
+      border: 0;
+      margin-top: 10px;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2 style="color: #f48fb1; font-size: 28px; margin-top: 0;">Your Cart</h2>
+    <div class="top-actions">
+      <button class="btn" onclick="goBackToShop()">← Continue Shopping</button>
+      <button class="btn" onclick="clearCart()">Clear Cart</button>
+    </div>
+    <table id="cartTable">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Price (₹)</th>
+          <th>Quantity</th>
+          <th>Subtotal (₹)</th>
+        </tr>
+      </thead>
+      <tbody id="cartBody">
+        <!-- JS fills this -->
+      </tbody>
+      <tr>
+        <td> Delivery Fee </td>
+        <td> 20 </td>
+        <td></td>
+        <td>20</td>
+      </tr>
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="3">Total</td>
+          <td id="totalCell">₹0</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <h3 style="color: #f48fb1; margin-top: 30px;">Delivery Address</h3>
+    <label style="color: #8d6e63; font-weight: bold;">Enter full address:</label>
+    <textarea id="address"></textarea>
+
+    <h3 style="color: #f48fb1;">Location (Map)</h3>
+    <!-- Simple embedded Google Map (you can change the place name after 'q=') -->
+    <iframe id="mapFrame" src="https://www.google.com/maps?q=Your%20City&output=embed" allowfullscreen=""
+      loading="lazy">
+    </iframe>
+
+    <button class="btn" style="margin-top: 20px;" onclick="placeOrder()">Place Order</button>
+    <p id="orderStatus" style="font-weight: bold; color: #d81b60;"></p>
+
+    <p><a href="#" onclick="goBackToShop(); return false;"
+        style="color: #d81b60; font-weight: bold; text-decoration: none;">← Back to shop page</a></p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, setDoc, doc, updateDoc, deleteDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC2NeomlNHM7jTFQXoCIt3xR3L1rKGWjoc",
+      authDomain: "bakery-site-3b5a3.firebaseapp.com",
+      projectId: "bakery-site-3b5a3",
+      storageBucket: "bakery-site-3b5a3.firebasestorage.app",
+      messagingSenderId: "35232571735",
+      appId: "1:35232571735:web:8a9c607dc990802d135e12"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    function getCart() {
+      const data = localStorage.getItem("cart");
+      return data ? JSON.parse(data) : [];
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem("cart", JSON.stringify(cart));
+      notifyParent();
+    }
+
+    function notifyParent() {
+      try {
+        if (window.parent && typeof window.parent.updateCartBadge === "function") {
+          window.parent.updateCartBadge();
+        }
+      } catch (e) {
+        console.log("Could not update parent badge: ", e);
+      }
+    }
+
+    function loadCart() {
+      const cart = getCart();
+      const tbody = document.getElementById("cartBody");
+      tbody.innerHTML = "";
+      let total = 0;
+
+      cart.forEach((item, index) => {
+        const subtotal = item.price * item.qty;
+        total += subtotal;
+
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+        <td>${item.name}</td>
+        <td>${item.price}</td>
+        <td>
+          <input class="qty-input" type="number" min="1" value="${item.qty}"
+                 onchange="window.updateQuantity(${index}, this.value)">
+        </td>
+        <td>${total}</td>
+      `;
+
+        tbody.appendChild(row);
+      });
+
+      document.getElementById("totalCell").innerText = "₹" + (total + 20);
+    }
+
+    window.updateQuantity = function (index, newQty) {
+      let cart = getCart();
+      newQty = parseInt(newQty);
+      if (isNaN(newQty) || newQty < 1) newQty = 1;
+      cart[index].qty = newQty;
+      saveCart(cart);
+      loadCart();
+    }
+
+    window.clearCart = function () {
+      localStorage.removeItem("cart");
+      loadCart();
+      notifyParent();
+    }
+
+    window.goBackToShop = function () {
+      try {
+        if (window.parent && typeof window.parent.openInFrame === "function") {
+          window.parent.openInFrame("home.html");
+          return;
+        }
+      } catch (e) {
+        console.log("Cross-origin error accessing parent, using fallback");
+      }
+
+      try {
+        window.top.location.href = "home.html?page=items.html";
+      } catch (e) {
+        window.location.href = "items.html";
+      }
+    }
+
+    window.placeOrder = async function () {
+      const cart = getCart();
+      const address = document.getElementById("address").value.trim();
+      const status = document.getElementById("orderStatus");
+
+      if (cart.length === 0) {
+        status.innerText = "Your cart is empty.";
+        return;
+      }
+      if (!address) {
+        status.innerText = "Please enter your delivery address.";
+        return;
+      }
+
+      // Calculate total
+      let total = 20;
+      cart.forEach(item => total += item.price * item.qty);
+
+      const newOrder = {
+        items: cart,
+        total: total,
+        address: address,
+        timestamp: new Date().toISOString()
+      };
+
+      try {
+        status.innerText = "Processing order...";
+        status.style.color = "#5d4037"; // Mocha color while loading
+
+        // Save order globally in Firebase
+        const docRef = await addDoc(collection(db, "orders"), newOrder);
+
+        // Clear local cart
+        localStorage.removeItem("cart");
+        notifyParent();
+
+        status.innerText = "Order placed successfully! Total: ₹" + total + " (Order ID: " + docRef.id + ")";
+        status.style.color = "#4CAF50"; // Green color
+        loadCart();
+      } catch (e) {
+        console.error("Error adding document: ", e);
+        status.innerText = "Failed to place order. Please try again.";
+        status.style.color = "#d81b60"; // Red error color
+      }
+    }
+
+    // Optionally update map location based on address (simple version)
+    document.getElementById("address").addEventListener("blur", function () {
+      const addr = encodeURIComponent(this.value || "Your City");
+      document.getElementById("mapFrame").src =
+        "https://www.google.com/maps?q=" + addr + "&output=embed";
+    });
+
+    // Initial load
+    loadCart();
+  </script>
+</body>
+
+</html>

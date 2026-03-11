@@ -1,0 +1,8 @@
+<video id="t" controls style="width:600px;max-width:100%">
+  <source src="./video.mp4" type="video/mp4">
+</video>
+<script>
+  const v = document.getElementById('t');
+  v.addEventListener('error', () => console.log('ERR', v.error?.code, v.error));
+  v.addEventListener('loadedmetadata', () => console.log('META duration', v.duration));
+</script>
